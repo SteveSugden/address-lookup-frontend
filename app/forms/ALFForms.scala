@@ -43,6 +43,11 @@ object ALFForms extends EmptyStringValidator {
     case _ => Valid
   })
 
+  def postcodeConstraintOptional(isWelsh: Boolean, isUkMode: Boolean): Constraint[String] = Constraint[String](Some("constraints.postcode"), Seq.empty)({
+    case empty if empty.isEmpty => Valid
+    case  _ @ pc => postcodeConstraint(isWelsh, isUkMode).apply(pc)
+  })
+
 
   def lookupForm(isWelsh: Boolean = false, isUkMode: Boolean = false) = Form(
     mapping(
@@ -53,6 +58,11 @@ object ALFForms extends EmptyStringValidator {
 
   val minimumLength: Int = 1
   val maximumLength: Int = 255
+  val validAddressCharacters = "-/,+:."
+
+  def isValidAddressField(addressField: String) = addressField.forall { ch =>
+    ch.isLetterOrDigit || ch.isWhitespace || validAddressCharacters.exists(_ == ch)
+  }
 
   def minimumConstraint(isWelsh: Boolean): Constraint[String] = new Constraint[String](Some("length.min"), Seq.empty)(value =>
     if(value.length >= minimumLength) Valid else Invalid(messageConstants(isWelsh).errorMin(minimumLength))
@@ -76,13 +86,19 @@ object ALFForms extends EmptyStringValidator {
     )(Select.apply)(Select.unapply)
   )
 
-  val constraintString256 = (msg: String)  => new Constraint[String](Some("length.max"),Seq.empty)(s => if(s.length < 256) {
+  val constraintString256 = (msg: String)  => new Constraint[String](Some("length.max"),Seq.empty)(s => if(s.length <= maximumLength) {
     Valid
   } else {
     Invalid(msg)
   } )
 
   val constraintMinLength = (msg: String) => new Constraint[String](Some("length.min"),Seq.empty)(s => if(s.nonEmpty) {
+    Valid
+  } else {
+    Invalid(msg)
+  } )
+
+  val constraintAddressField = (msg: String) => new Constraint[String](Some("constraints.addressInput"),Seq.empty)(s => if(isValidAddressField(s)) {
     Valid
   } else {
     Invalid(msg)
@@ -103,12 +119,16 @@ object ALFForms extends EmptyStringValidator {
   def ukEditForm(isWelsh: Boolean = false, isUKMode: Boolean = true): Form[Edit] = Form(
     mapping(
       "line1" -> customErrorTextValidation(messageConstants(isWelsh, isUKMode).editPageAddressLine1MinErrorMessage)
+        .verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 1" else "llinell cyfeiriad 1")))
         .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine1MaxErrorMessage)),
-      "line2" -> optional(text.verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine2MaxErrorMessage))),
-      "line3" -> optional(text.verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine3MaxErrorMessage))),
+      "line2" -> optional(text.verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 2" else "llinell cyfeiriad 2")))
+        .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine2MaxErrorMessage))),
+      "line3" -> optional(text.verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 3" else "llinell cyfeiriad 3")))
+        .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine3MaxErrorMessage))),
       "town" -> customErrorTextValidation(messageConstants(isWelsh, isUKMode).editPageTownMinErrorMessage)
+        .verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "town" else "tref")))
         .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageTownMaxErrorMessage)),
-      "postcode" -> default(text,""),
+      "postcode" -> default(text,"").verifying(postcodeConstraintOptional(isWelsh, isUKMode)),
       "countryCode" -> ignored[Option[String]](Option("GB"))
     )(Edit.apply)(Edit.unapply)
   )
@@ -116,10 +136,14 @@ object ALFForms extends EmptyStringValidator {
   def nonUkEditForm(isWelsh: Boolean = false, isUKMode: Boolean = false) = Form(
     mapping(
       "line1" -> customErrorTextValidation(messageConstants(isWelsh, isUKMode).editPageAddressLine1MinErrorMessage)
+        .verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 1" else "llinell cyfeiriad 1")))
         .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine1MaxErrorMessage)),
-      "line2" -> optional(text.verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine2MaxErrorMessage))),
-      "line3" -> optional(text.verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine3MaxErrorMessage))),
+      "line2" -> optional(text.verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 2" else "llinell cyfeiriad 2")))
+        .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine2MaxErrorMessage))),
+      "line3" -> optional(text.verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "address line 3" else "llinell cyfeiriad 3")))
+        .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageAddressLine3MaxErrorMessage))),
       "town" -> customErrorTextValidation(messageConstants(isWelsh, isUKMode).editPageTownMinErrorMessage)
+        .verifying(constraintAddressField(messageConstants(isWelsh, isUKMode).validAddressInput(if (!isWelsh) "town" else "tref")))
         .verifying(constraintString256(messageConstants(isWelsh, isUKMode).editPageTownMaxErrorMessage)),
       "postcode" -> default(text,""),
       "countryCode" -> optional(text(2))

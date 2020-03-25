@@ -77,6 +77,126 @@ class ALFFormsSpec extends WordSpec with MustMatchers{
     "isvalidPostCode should  accept international address with valid postcode because country is defaulted to GB" in {
       ALFForms.isValidPostcode(editFormUk.fill(Edit("", None, None, "", "ZZ1 1ZZ", Some("FR")))).hasErrors mustBe false
     }
+
+    "should return error if line1 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1 $",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe true
+    }
+
+    "should not return error if line1 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1 -/,+:.",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+
+    "should return error if line2 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2 #",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe true
+    }
+
+    "should not return error if line2 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2 -/,+:.",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+
+    "should return error if line3 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3 !",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe true
+    }
+
+    "should not return error if line3 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3 -/,+:.",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+
+    "should return error if town has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town £",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe true
+    }
+
+    "should not return error if town has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town -/,+:.",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+    "should return error if postcode has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town £",
+        "postcode" -> "AA199ZZ $",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe true
+    }
+
+    "should not return error if postcode has valid space characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town -/,+:.",
+        "postcode" -> "AA19 9ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+
   }
 
   "nonUkEditForm" should {
@@ -96,6 +216,118 @@ class ALFFormsSpec extends WordSpec with MustMatchers{
         "line2" -> "foo2",
         "town" -> "twn",
         "postcode" -> "fudgebarwizz123")
+
+      editFormNonuk.bind(data).hasErrors mustBe false
+    }
+    "return error if line1 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1 $",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe true
+    }
+
+    "not return error if line1 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1 -/,+:.",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe false
+    }
+    "error if line2 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2 #",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe true
+    }
+    "not return error if line2 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2 -/,+:.",
+        "line3" -> "line 3",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe false
+    }
+    "return error if line3 has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3 !",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe true
+    }
+    "not return error if line3 has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3 -/,+:.",
+        "town" -> "town",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe false
+    }
+    "return error if town has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town £",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe true
+    }
+    "not return error if town has valid special characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town -/,+:.",
+        "postcode" -> "AA199ZZ",
+        "countryCode" -> "GB")
+
+      editFormUk.bind(data).hasErrors mustBe false
+    }
+    "return error if postcode has invalid characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town £",
+        "postcode" -> "AA199ZZ $",
+        "countryCode" -> "GB")
+
+      editFormNonuk.bind(data).hasErrors mustBe true
+    }
+
+    "not return error if postcode has valid space characters" in {
+      val data = Map(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "line3" -> "line 3",
+        "town" -> "town -/,+:.",
+        "postcode" -> "AA19 9ZZ",
+        "countryCode" -> "GB")
 
       editFormNonuk.bind(data).hasErrors mustBe false
     }
@@ -137,6 +369,33 @@ class ALFFormsSpec extends WordSpec with MustMatchers{
             ALFForms.isValidPostcode(form.fill(Edit("", None, None, "", postcode, Some("GB")))).hasErrors mustBe false
           }
       }
+
+      // #Scenario Outline: UK Address with Invalid address line1/line2/line3/town
+      Seq(
+        ("case 1","~"),
+        ("case 2","!"),
+        ("case 3","@"),
+        ("case 4","#"),
+        ("case 5","$"),
+        ("case 6","%"),
+        ("case 7","^"),
+        ("case 8","&"),
+        ("case 9","*"),
+        ("case 10","$"),
+        ("case 11","("),
+        ("case 12",")"),
+        ("case 13","$"),
+        ("case 14","£"),
+        ("case 15","_")).foreach {
+        case (caseNum, addressField) =>
+          s"not accept a UK address with an invalid address field ($caseNum) for $formOfTest" in {
+            form.fillAndValidate(Edit(addressField, None, None, "", "SW1A 1AA", Some("GB"))).hasErrors mustBe true
+            form.fillAndValidate(Edit("", Some(addressField), None, "", "SW1A 1AA", Some("GB"))).hasErrors mustBe true
+            form.fillAndValidate(Edit("", None, Some(addressField), "", "SW1A 1AA", Some("GB"))).hasErrors mustBe true
+            form.fillAndValidate(Edit("", None, None, addressField, "SW1A 1AA", Some("GB"))).hasErrors mustBe true
+          }
+      }
+
       s"accept valid postcode and no CountryCode as country code is defaulted for $formOfTest" in {
         ALFForms.isValidPostcode(form.fill(Edit("", None, None, "", "ZZ11ZZ", None))).hasErrors mustBe false
       }
@@ -227,6 +486,35 @@ class ALFFormsSpec extends WordSpec with MustMatchers{
     }
     "return valid for string > 0 chars" in {
       ALFForms.constraintMinLength("foo")("1") mustBe Valid
+    }
+  }
+  "constraintAddressField" should {
+    "return invalid for $ characters" in {
+      ALFForms.constraintAddressField("foo")("address $ line") mustBe Invalid("foo")
+    }
+    "return Invalid for £ characters" in {
+      ALFForms.constraintAddressField("foo")("address £ line") mustBe Invalid("foo")
+    }
+    "return Invalid for # characters" in {
+      ALFForms.constraintAddressField("foo")("address # line") mustBe Invalid("foo")
+    }
+    "return Invalid for ! characters" in {
+      ALFForms.constraintAddressField("foo")("address ! line") mustBe Invalid("foo")
+    }
+    "return Valid with space" in  {
+      ALFForms.constraintAddressField("foo")("address line") mustBe Valid
+    }
+    "return Valid with alphabets" in  {
+      ALFForms.constraintAddressField("foo")("addressline") mustBe Valid
+    }
+    "return Valid with digits" in  {
+      ALFForms.constraintAddressField("foo")("1") mustBe Valid
+    }
+    "return Valid with alphabets and digits" in  {
+      ALFForms.constraintAddressField("foo")("line1") mustBe Valid
+    }
+    "return Valid with -/,+:.s characters" in  {
+      ALFForms.constraintAddressField("foo")("-/,+:.") mustBe Valid
     }
   }
 }

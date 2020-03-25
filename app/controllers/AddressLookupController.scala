@@ -215,7 +215,7 @@ class AddressLookupController @Inject()(journeyRepository: JourneyRepository, ad
         val isUKMode = journeyData.config.options.isUkMode
 
         if (isUkAddress) {
-          val validatedForm = isValidPostcode(ukEditForm(isWelsh, isUKMode).bindFromRequest(), isWelsh, isUKMode)
+          val validatedForm = ukEditForm(isWelsh, isUKMode).bindFromRequest()
 
           validatedForm.fold(
             errors => (None, requestWithWelshHeader(isWelsh) {
@@ -226,7 +226,7 @@ class AddressLookupController @Inject()(journeyRepository: JourneyRepository, ad
             })
           )
         } else {
-          val validatedForm = isValidPostcode(nonUkEditForm(isWelsh, isUKMode).bindFromRequest(), isWelsh, isUKMode)
+          val validatedForm = nonUkEditForm(isWelsh, isUKMode).bindFromRequest()
 
           validatedForm.fold(
             errors => (None, requestWithWelshHeader(isWelsh) {

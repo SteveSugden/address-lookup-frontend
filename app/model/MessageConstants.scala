@@ -42,6 +42,8 @@ object MessageConstants {
 
     def ukModePostcodeLabel: String
 
+    def validAddressInput: String => String
+
     def editPageAddressLine1MaxErrorMessage: String
     def editPageAddressLine2MaxErrorMessage: String
     def editPageAddressLine3MaxErrorMessage: String
@@ -81,6 +83,8 @@ object MessageConstants {
     val timeoutResumeSession = "Resume your session"
     val timeoutInactive = "You've been inactive for a while."
     val ukModePostcodeLabel = "UK postcode (optional)"
+
+    val validAddressInput : String => String = field => s"Enter a valid $field"
 
     val editPageAddressLine1MaxErrorMessage = "Enter a first address line using 256 characters or less"
     val editPageAddressLine2MaxErrorMessage = "Enter a second address line using 256 characters or less"
@@ -182,6 +186,8 @@ object MessageConstants {
     val nameNumberText = "ar gyfer enw neu rif"
     val youEntered = "Nodoch:"
     val tooManyResultsManualLink = "Nodwch y cyfeiriad â llaw"
+
+    val validAddressInput : String => String = field => s"Rhowch ddilys $field"
 
     val editPageAddressLine1MaxErrorMessage = "Nodwch linell gyntaf y cyfeiriad gan ddefnyddio 256 o gymeriadau neu lai"
     val editPageAddressLine2MaxErrorMessage = "Nodwch ail linell y cyfeiriad gan ddefnyddio 256 o gymeriadau neu lai"
