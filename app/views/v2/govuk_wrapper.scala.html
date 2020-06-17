@@ -93,7 +93,13 @@
     @alfFooterLinks(
         additionalLinks = None,
         euExitLinks = None,
-        accessibilityFooterUrl = journeyData.flatMap(_.resolveConfigV2(welshEnabled).options.accessibilityFooterUrl)
+        accessibilityFooterUrl = {
+            if(journeyData.flatMap(_.resolveConfigV2(welshEnabled).options.accessibilityFooterUrl).isDefined) {
+                Some(journeyData.flatMap(_.resolveConfigV2(welshEnabled).options.accessibilityFooterUrl).get + "?service=address-lookup&userAction=" + request.uri.split('/').last)
+            } else {
+                None
+            }
+        }
     )
 }
 
