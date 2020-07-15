@@ -23,6 +23,14 @@
   isUKMode: Boolean = true
 )(implicit request: Request[_], messages: Messages)
 
+@fullTitle = @{
+    if(journeyData.flatMap(_.resolveConfigV2(welshEnabled, appConfig).labels.appLevelLabels.navTitle).isDefined) {
+        title + " - " + journeyData.flatMap(_.resolveConfigV2(welshEnabled, appConfig).labels.appLevelLabels.navTitle).get + " - GOV.UK"
+    } else {
+        title
+    }
+}
+
 @messageConstants = @{if(welshEnabled) WelshMessageConstants(isUKMode) else EnglishMessageConstants(isUKMode)}
 
 @links = {
@@ -155,4 +163,4 @@
     )
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(footerLinks), true)(content)
+@hmrcGovUkTemplate(Some(fullTitle), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(footerLinks), true)(content)
